@@ -6912,11 +6912,8 @@ free_unref_items(copyID)
 	    /* Free the Dictionary and ordinary items it contains, but don't
 	     * recurse into Lists and Dictionaries, they will be in the list
 	     * of dicts or list of lists. */
-	    dict_free(dd, FALSE);
+	    dd = dict_free(dd, FALSE);
 	    did_free = TRUE;
-
-	    /* restart, next dict may also have been freed */
-	    dd = first_dict;
 	}
 	else
 	    dd = dd->dv_used_next;
@@ -7077,8 +7074,9 @@ dict_unref(d)
 /*
  * Free a Dictionary, including all items it contains.
  * Ignores the reference count.
+ * Returns next dict or NULL
  */
-    void
+    dict_T*
 dict_free(d, recurse)
     dict_T  *d;
     int	    recurse;	/* Free Lists and Dictionaries recursively. */
@@ -7086,12 +7084,13 @@ dict_free(d, recurse)
     int		todo;
     hashitem_T	*hi;
     dictitem_T	*di;
+    dict_T	*next;
 
     /* Remove the dict from the list of dicts for garbage collection. */
-    if (d->dv_used_prev == NULL)
-	first_dict = d->dv_used_next;
-    else
-	d->dv_used_prev->dv_used_next = d->dv_used_next;
+    if (d->dv_used_prev == NULL) {
+	next = first_dict = d->dv_used_next;
+    } else
+	next = d->dv_used_prev->dv_used_next = d->dv_used_next;
     if (d->dv_used_next != NULL)
 	d->dv_used_next->dv_used_prev = d->dv_used_prev;
 
@@ -7115,6 +7114,8 @@ dict_free(d, recurse)
     }
     hash_clear(&d->dv_hashtab);
     vim_free(d);
+
+    return next;
 }
 
 /*

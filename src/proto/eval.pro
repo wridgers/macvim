@@ -67,7 +67,7 @@ void set_ref_in_list __ARGS((list_T *l, int copyID));
 void set_ref_in_item __ARGS((typval_T *tv, int copyID));
 dict_T *dict_alloc __ARGS((void));
 void dict_unref __ARGS((dict_T *d));
-void dict_free __ARGS((dict_T *d, int recurse));
+dict_T *dict_free __ARGS((dict_T *d, int recurse));
 dictitem_T *dictitem_alloc __ARGS((char_u *key));
 void dictitem_free __ARGS((dictitem_T *item));
 int dict_add __ARGS((dict_T *d, dictitem_T *item));
